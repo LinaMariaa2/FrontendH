@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 
 export default function GestionUsuariosPage() {
+  const [searchTerm, setSearchTerm] = useState("");
   const [usuarios, setUsuarios] = useState([
     {
       id: 1,
@@ -29,7 +30,6 @@ export default function GestionUsuariosPage() {
 
   const [editarModalOpen, setEditarModalOpen] = useState(false);
   const [usuarioEditando, setUsuarioEditando] = useState<any>(null);
-
   const [form, setForm] = useState({
     nombre: "",
     correo: "",
@@ -68,12 +68,31 @@ export default function GestionUsuariosPage() {
     }
   };
 
+  const usuariosFiltrados = usuarios.filter((usuario) =>
+    [usuario.nombre, usuario.correo, usuario.rol]
+      .join(" ")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+
   return (
     <main className="min-h-screen p-6 bg-gray-50">
-      <h1 className="text-4xl font-bold text-green-800 mb-8">Gestión de Usuarios</h1>
+      <h1 className="text-4xl font-bold text-green-800 mb-6">Gestión de Usuarios</h1>
+
+      <input
+        type="text"
+        placeholder="Buscar por nombre, correo o rol..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="mb-6 w-full max-w-md border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+      />
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {usuarios.map((usuario) => (
+        {usuariosFiltrados.length === 0 && (
+          <p className="col-span-full text-gray-500">No se encontraron usuarios.</p>
+        )}
+
+        {usuariosFiltrados.map((usuario) => (
           <div key={usuario.id} className="bg-white rounded-xl shadow-md p-5 border border-gray-200">
             <div className="flex items-center gap-4 mb-3">
               <Image
